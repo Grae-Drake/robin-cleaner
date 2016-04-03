@@ -3,16 +3,18 @@
 // Reloads clear JS variables, so we're using localStorage to store persistent
 // lists of muted users and messages.
 
+// TODO: 
+
 var getMuted = function(mutedKey) {
 	// Grab set of muted things from localStorage for easy reading.
 
-	return new SET(JSON.parse(localStorage.getItem(mutedKey)) || []);
+	return new Set(JSON.parse(localStorage.getItem(mutedKey)) || []);
 };
 
 var setMuted = function(mutedKey, mutedList) {
 	// Sets the list of things to mute to localStorage. Persists through reloads.
 	
-	localStorage.setItem(mutedKey, JSON.stringify(mutedList));
+	localStorage.setItem(mutedKey, JSON.stringify(Array.from(mutedList)));
 };
 
 // variables with our muted users and messages for ease of access.
@@ -23,7 +25,7 @@ var mute = function(text, mutedList, mutedKey) {
 	// Adds a new username to the list of muted users.
 
 	mutedList.add(text);
-	setMuted(mutedList, mutedKey);
+	setMuted(mutedKey, mutedList);
 };
 
 var muteUser = function(text) {
@@ -38,12 +40,12 @@ var clearMuted = function(mutelist) {
 	localStorage.setItem(mutelist, JSON.stringify([]));
 };
 
-var clearMutedUser = function() {
+var clearMutedUsers = function() {
 	clearMuted("mutedUsers");
-	mutedUsers = [];
+	mutedUsers = new Set([]);
 };
 
-var clearMutedUser = function() {
+var clearMutedMessages = function() {
 	clearMuted("mutedMessages");
 	mutedMessages = [];
 };
@@ -73,6 +75,14 @@ var observer = new MutationObserver(function(mutations) {
 			}
 
 			// TODO: Listen for /muteMessage command
+
+			// TODO: Listen for /clearMutedUsers command
+			if (message.indexOf("/clearMutedUsers") > -1) {
+				clearMutedUsers();
+			}
+
+			// TODO: Listen for clearMutedMessages command
+
     }
 
     // Remove messages from muted users.
